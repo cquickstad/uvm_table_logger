@@ -27,9 +27,9 @@
 //    the order of those columns in the table.
 // 2. Add add a get_log_table() function to your transaction object that returns type rows_of_log_fields_t.
 //    Remember to populate the return data (rows of fields) to represent the transaction in table format.
-// 3. Instantiate a table_logger_cfg instance (or a child of it) add add it to the uvm_config_db.
+// 3. Instantiate a table_logger_cfg instance (or a child of it) and add add it to the uvm_config_db.
 // 4. Instantiate a table_logger instance.
-// 5. Connect your monitor's analysis port to the table_looger's analysis_export in the connect_phase.
+// 5. Connect your monitor's analysis port to the table_logger's analysis_export in the connect_phase.
 
 
 typedef string rows_of_log_fields_t[][string]; // Return type for T_CAST.get_log_table()
