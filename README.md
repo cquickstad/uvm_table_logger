@@ -73,3 +73,6 @@ class my_env extends uvm_env;
   ...
 endclass
 ```
+
+## Example
+See the `example` directory for a complete simple UVM testbench that uses the table logger.
