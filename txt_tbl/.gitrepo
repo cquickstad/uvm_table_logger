@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:cquickstad/txt_tbl.git
+	branch = master
+	commit = 0e42d927d7b1d1c14207fa04d23815ec832088d1
+	parent = 36ab792c5422ff63c7eca1b98bcc28adce52998c
+	method = merge
+	cmdver = 0.4.3
