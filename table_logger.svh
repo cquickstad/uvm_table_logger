@@ -118,9 +118,9 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
     string f = fields[i];
     string column_title = (cfg.col_title.exists(f)) ? cfg.col_title[f] : f;
     int width = (cfg.col_width.exists(f)) ? cfg.col_width[f] : 0;
-    int left_justify_title = (cfg.col_title_left_justify.exists(f)) ? cfg.col_title_left_justify[f] : 0;
-    int left_justify_field = (cfg.col_field_left_justify.exists(f)) ? cfg.col_field_left_justify[f] : 0;
-    int sticky_width_growth = (cfg.col_sticky_width_growth.exists(f)) ? cfg.col_sticky_width_growth[f] : 1;
+    bit left_justify_title = (cfg.col_title_left_justify.exists(f)) ? cfg.col_title_left_justify[f] : 0;
+    bit left_justify_field = (cfg.col_field_left_justify.exists(f)) ? cfg.col_field_left_justify[f] : 0;
+    bit sticky_width_growth = (cfg.col_sticky_width_growth.exists(f)) ? cfg.col_sticky_width_growth[f] : 1;
     tt.add_column(column_title, width, left_justify_title, left_justify_field, sticky_width_growth);
   endfunction
 
