@@ -26,7 +26,9 @@
 
 interface my_interface(input reset_n, input clk);
 
-  wire valid, a, b;
+  wire valid;
+  wire [31:0] a, b;
+  wire [1:0] c;
 
   clocking cb @(posedge clk);
     default input #1step output #0;
@@ -34,6 +36,7 @@ interface my_interface(input reset_n, input clk);
     inout valid;
     inout a;
     inout b;
+    inout c;
   endclocking
 
 endinterface

@@ -20,17 +20,15 @@
 // Look for the latest version of this code at:
 //  https://github.com/cquickstad/uvm_table_logger.git
 
+`ifndef __MY_PKG_SV__
+`define __MY_PKG_SV__
 
 package my_pkg;
 
   import uvm_pkg::*;
   `include "uvm_macros.svh"
 
-  `include "txt_tbl.sv"
-
-  `include "table_logger_cfg.svh"
-  `include "table_logger.svh"
-
+  `include "my_types.svh"
   `include "my_item.svh"
   `include "my_sequencer.svh"
   `include "my_driver.svh"
@@ -46,3 +44,5 @@ package my_pkg;
   `include "my_test_lib.svh"
 
 endpackage
+
+`endif

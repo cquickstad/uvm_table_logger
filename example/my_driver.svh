@@ -64,6 +64,7 @@ class my_driver extends uvm_driver #(my_item);
     vif.cb.valid <= '1;
     vif.cb.a <= req.a;
     vif.cb.b <= req.b;
+    vif.cb.c <= req.c;
     seq_item_port.item_done();
   endtask
 
@@ -71,6 +72,7 @@ class my_driver extends uvm_driver #(my_item);
     vif.cb.valid <= '0;
     vif.cb.a <= 'X;
     vif.cb.b <= 'X;
+    vif.cb.c <= 'X;
   endtask
 
 endclass

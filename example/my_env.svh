@@ -27,8 +27,8 @@ class my_env extends uvm_env;
   my_agent agt_x;
   my_agent agt_y;
 
-  table_logger_cfg log_cfg;
-  table_logger#(my_table_item, my_item) logger;
+  table_logger_pkg::table_logger_cfg log_cfg;
+  table_logger_pkg::table_logger#(my_table_item, my_item) logger;
 
   function new(string name="my_env", uvm_component parent=null);
     super.new(name, parent);
@@ -41,7 +41,7 @@ class my_env extends uvm_env;
     configure_logger();
     agt_x = my_agent::type_id::create("agt_x", this);
     agt_y = my_agent::type_id::create("agt_y", this);
-    logger = table_logger#(my_table_item, my_item)::type_id::create("logger", this);
+    logger = table_logger_pkg::table_logger#(my_table_item, my_item)::type_id::create("logger", this);
   endfunction
 
   virtual function void connect_phase(uvm_phase phase);
@@ -62,15 +62,17 @@ class my_env extends uvm_env;
   endfunction
 
   protected virtual function void configure_logger();
-    log_cfg = table_logger_cfg::type_id::create("cfg", this);
+    log_cfg = table_logger_pkg::table_logger_cfg::type_id::create("cfg", this);
     log_cfg.log_file_name = "my_log.log";
     log_cfg.col_width["ifc"] = 1;
-    log_cfg.col_width["a"] = 8;
-    log_cfg.col_width["b"] = 10;
-    log_cfg.col_title["ifc"] = "I\nn\nt\ne\nr\nf\nn\nc\ne";
+    log_cfg.set_col_width_for_hex("a", 32);
+    log_cfg.set_col_width_for_dec_bits("b", 32);
+    log_cfg.col_width["c"] = table_logger_pkg::enum_width_finder#(my_enum_t)::get_max_width();
+    log_cfg.set_col_title_vertical("ifc", "Interface");
     log_cfg.col_title["a"] = "Value A\n(hex)";
     log_cfg.col_title["b"] = "Value B\n(decimal)";
-    uvm_config_db#(table_logger_cfg)::set(this, "logger", "cfg", log_cfg);
+    log_cfg.col_title["c"] = "Value C";
+    uvm_config_db#(table_logger_pkg::table_logger_cfg)::set(this, "logger", "cfg", log_cfg);
   endfunction
 
 endclass

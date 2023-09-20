@@ -21,6 +21,7 @@ xcelium \
   \
   $* \
   \
+  ../table_logger_pkg.sv \
   my_interface.sv \
   my_pkg.sv \
   \

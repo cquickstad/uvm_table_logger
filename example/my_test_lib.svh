@@ -32,6 +32,12 @@ class rand_test extends my_test_base;
     super.new(name, parent);
   endfunction
 
+  virtual function void start_of_simulation_phase(uvm_phase phase);uvm_root r;
+    uvm_root root = uvm_root::get();
+    super.start_of_simulation_phase(phase);
+    root.print_topology();
+  endfunction
+
   virtual task run_phase(uvm_phase phase);
     super.run_phase(phase);
     phase.raise_objection(this);

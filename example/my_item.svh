@@ -29,8 +29,14 @@ class my_item extends uvm_sequence_item;
   string ifc;
   rand reg [31:0] a;
   rand reg [31:0] b;
+  rand my_enum_t c;
 
-  `uvm_object_utils(my_item)
+  `uvm_object_utils_begin(my_item)
+    `uvm_field_string(ifc, UVM_ALL_ON)
+    `uvm_field_int(a, UVM_ALL_ON)
+    `uvm_field_int(b, UVM_ALL_ON)
+    `uvm_field_enum(my_enum_t, c, UVM_ALL_ON)
+  `uvm_object_utils_end
 
   function new(string name="my_item");
     super.new(name);

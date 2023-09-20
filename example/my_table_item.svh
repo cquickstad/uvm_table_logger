@@ -31,13 +31,15 @@ class my_table_item extends my_item;
   // The columns in the log file's table and the order of the columns are specified by the
   // following static array of strings.  Each element is a tag that represents the column.
   // The actual title of the column is set with table_logger_cfg.
-  static string log_fields[] = {"ifc", "a", "b"};
+  static string log_fields[] = {"ifc", "a", "b", "c"};
 
+  typedef string rows_of_log_fields_t[][string];
   virtual function rows_of_log_fields_t get_log_table();
     get_log_table = new[1]; // This transaction is reported on a single row in the table
     get_log_table[0]["ifc"] = ifc;
     get_log_table[0]["a"] = $sformatf("%0x", a);
     get_log_table[0]["b"] = $sformatf("%0d", b);
+    get_log_table[0]["c"] = c.name();
   endfunction
 
 endclass
