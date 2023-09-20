@@ -35,41 +35,98 @@ class table_logger_cfg extends uvm_object;
   bit col_field_left_justify[string];
   bit col_sticky_width_growth[string];
 
-  `uvm_object_utils(table_logger_cfg)
+  `uvm_object_utils_begin(table_logger_cfg)
+    `uvm_field_aa_int_string(col_en, UVM_ALL_ON)
+    `uvm_field_aa_int_string(col_width, UVM_ALL_ON)
+    `uvm_field_aa_string_string(col_title, UVM_ALL_ON)
+    `uvm_field_aa_int_string(col_title_left_justify, UVM_ALL_ON)
+    `uvm_field_aa_int_string(col_field_left_justify, UVM_ALL_ON)
+    `uvm_field_aa_int_string(col_sticky_width_growth, UVM_ALL_ON)
+  `uvm_object_utils_end
 
   function new(string name="table_logger_cfg");
     super.new(name);
   endfunction
 
-  function void do_copy(uvm_object rhs);
-    table_logger_cfg rhs_;
-    if (!$cast(rhs_, rhs)) `uvm_fatal("TABLE_LOGGER_CFG_CAST:", "Failed to cast to table_logger_cfg")
-    super.do_copy(rhs);
-    this.log_file_name = rhs_.log_file_name;
-    this.empty_field_value = rhs_.empty_field_value;
-    this.col_en = rhs_.col_en;
-    this.col_width = rhs_.col_width;
-    this.col_title = rhs_.col_title;
+  // Helper to set the column title vertically.
+  // For example: set_col_title_vertical("bus_error", "Bus Error") would produce the following
+  //              column title for a column with tag "bus_error":
+  //              +---+
+  //              | B |
+  //              | u |
+  //              | s |
+  //              |   |
+  //              | E |
+  //              | r |
+  //              | r |
+  //              | o |
+  //              | r |
+  //              +---+
+  virtual function void set_col_title_vertical(string column_tag, string title);
+    col_title[column_tag] = string2vertical(title);
   endfunction
 
-  function bit do_compare(uvm_object rhs, uvm_comparer comparer);
-    table_logger_cfg rhs_;
-    do_compare = super.do_compare(rhs, comparer);
-    if (!$cast(rhs_, rhs)) `uvm_fatal("TABLE_LOGGER_CFG_CAST:", "Failed to cast to table_logger_cfg")
-    do_compare &= (this.log_file_name == rhs_.log_file_name);
-    do_compare &= (this.empty_field_value == rhs_.empty_field_value);
-    do_compare &= (this.col_en.size() == rhs_.col_en.size());
-    do_compare &= (this.col_width.size() == rhs_.col_width.size());
-    do_compare &= (this.col_title.size() == rhs_.col_title.size());
-    do_compare &= (this.col_title_left_justify.size() == rhs_.col_title_left_justify.size());
-    do_compare &= (this.col_field_left_justify.size() == rhs_.col_field_left_justify.size());
-    do_compare &= (this.col_sticky_width_growth.size() == rhs_.col_sticky_width_growth.size());
-    foreach (this.col_en[s]) do_compare &= (rhs_.col_en.exists(s) && (this.col_en[s] == rhs_.col_en[s]));
-    foreach (this.col_width[s]) do_compare &= (rhs_.col_width.exists(s) && (this.col_width[s] == rhs_.col_width[s]));
-    foreach (this.col_title[s]) do_compare &= (rhs_.col_title.exists(s) && (this.col_title[s] == rhs_.col_title[s]));
-    foreach (this.col_title_left_justify[s]) do_compare &= (rhs_.col_title_left_justify.exists(s) && (this.col_title_left_justify[s] == rhs_.col_title_left_justify[s]));
-    foreach (this.col_field_left_justify[s]) do_compare &= (rhs_.col_field_left_justify.exists(s) && (this.col_field_left_justify[s] == rhs_.col_field_left_justify[s]));
-    foreach (this.col_sticky_width_growth[s]) do_compare &= (rhs_.col_sticky_width_growth.exists(s) && (this.col_sticky_width_growth[s] == rhs_.col_sticky_width_growth[s]));
+  // Helper to set the column width for a field to be printed in decimal
+  // given the number of bits of the field.
+  // Reminder: the number of bits of a type can be obtained with $bits().
+  // For example: set_col_width_for_dec_bits(.column_tag("my_column"),.bit_width($bits(my_type_t)))
+  virtual function void set_col_width_for_dec_bits(string column_tag, int bit_width);
+    longint max_value = (128'b1 << bit_width) - 1;
+    col_width[column_tag] = get_dec_str_width(max_value);
+  endfunction
+
+  // Helper to set the column width for a field to be printed in decimal
+  // given the maximum value expected to be represented.
+  // For example: set_col_width_for_dec_max(.column_tag("things"),.max_value(`NUMBER_OF_THINGS))
+  virtual function void set_col_width_for_dec_max(string column_tag, int max_value);
+    col_width[column_tag] = get_dec_str_width(max_value);
+  endfunction
+
+  // Helper to set the column width for a field to be printed in hexadecimal
+  // given the number of bits.
+  // Reminder: the number of bits of a type can be obtained with $bits().
+  // For example: get_hex_str_width(.bit_width($bits(my_type_t)))
+  virtual function void set_col_width_for_hex(string column_tag, int bit_width);
+    col_width[column_tag] = get_hex_str_width(bit_width);
+  endfunction
+
+  // Helper to determine the column width for a field to be printed as an integer
+  // decimal given the maximum value expected to be represented.
+  static function int get_dec_str_width(int max_value);
+    return  $rtoi($log10(max_value)) + 1;
+  endfunction
+
+  localparam NUM_BITS_PER_HEX_CHARACTER = 4;
+
+  // Helper to determine the column width for a field to be printed in hexadecimal
+  // given the number of bits.
+  // Reminder: the number of bits of a type can be obtained with $bits().
+  // For example: get_hex_str_width(.bit_width($bits(my_type_t)))
+  static function int get_hex_str_width(int bit_width);
+    return div_round_up(bit_width, NUM_BITS_PER_HEX_CHARACTER);
+  endfunction
+
+  // Helper function that implements the standard integer round-up division algorithm.
+  static function int div_round_up(int dividend, int divisor);
+    return (dividend + (divisor - 1)) / divisor;
+  endfunction
+
+  // Helper to transform a string from horizontal to vertical.
+  // For example: string2vertical("My String") returns "M\ny\n \nS\nt\nr\ni\nn\ng"
+  //              which will display as:
+  //              M
+  //              y
+  //
+  //              S
+  //              t
+  //              r
+  //              i
+  //              n
+  //              g
+  static function string string2vertical(string s);
+    string2vertical = "";
+    foreach (s[i]) string2vertical = {string2vertical, s[i], "\n"};
+    string2vertical = string2vertical.substr(0, string2vertical.len()-2);
   endfunction
 
 endclass
