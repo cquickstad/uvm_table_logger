@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git@github.com:cquickstad/txt_tbl.git
 	branch = master
-	commit = 0e42d927d7b1d1c14207fa04d23815ec832088d1
-	parent = 36ab792c5422ff63c7eca1b98bcc28adce52998c
+	commit = ee944924863ead5acf8823b66aa7354d6406a425
+	parent = 25629e4d35a316c79d747ed71894f1c4cfce5ee1
 	method = merge
-	cmdver = 0.4.3
+	cmdver = 0.4.9

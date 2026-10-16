@@ -19,66 +19,22 @@
 
 // This code is available from https://github.com/cquickstad/txt_tbl
 
-
-class column_info;
-  string  title_lines[$];
-  bit     left_justify_title;
-  bit     left_justify_field;
-  bit     sticky_width_growth;
-  protected int width;
-
-  function new(string title, int width, bit left_justify_title=1, bit left_justify_field, bit sticky_width_growth);
-    title_lines = line_to_q_helper(title);
-    set_width_to_largest_line();
-    this.width = max(width, this.width);
-    this.left_justify_title = left_justify_title;
-    this.left_justify_field = left_justify_field;
-    this.sticky_width_growth = sticky_width_growth;
-  endfunction : new
-
-  virtual function void prepend_blank_title_lines(int num_rows);
-    while (title_lines.size() < num_rows) title_lines.push_front("");
-  endfunction : prepend_blank_title_lines
-
-  virtual function int get_width(int txt_len_to_fit);
-    if (sticky_width_growth && txt_len_to_fit > width) width = txt_len_to_fit;
-    return width;
-  endfunction
-
-  typedef string str_q[$]; // SystemVerilog doesn't allow returning a queue without this trick
-  static function str_q line_to_q_helper(string line);
-    int substr_start = 0;
-    foreach (line[i]) begin
-      if (line[i] == "\n") begin
-        line_to_q_helper.push_back(line.substr(substr_start, i - 1));
-        substr_start = i + 1;
-      end
-    end
-    line_to_q_helper.push_back(line.substr(substr_start, line.len() - 1));
-  endfunction : line_to_q_helper
-
-  static function int max(int a, int b);
-    return (a > b) ? a : b;
-  endfunction : max
-
-  protected virtual function void set_width_to_largest_line();
-    width = 0;
-    foreach (title_lines[i]) width = max(width, title_lines[i].len());
-  endfunction : set_width_to_largest_line
-endclass : column_info
-
-
-
 class txt_tbl;
-  string left_border_char         = "|";
-  string right_border_char        = "|";
-  string vertical_border_char     = "|";
-  string horizontal_border_char   = "-";
-  string left_intersection_char   = "+";
-  string right_intersection_char  = "+";
-  string intersection_char        = "+";
-  string boundry_pad_char         = " ";
-  string pad_char                 = " ";
+  string left_border_char               = "|";
+  string right_border_char              = "|";
+  string vertical_border_char           = "|";
+  string horizontal_border_char         = "-";
+  string left_intersection_char         = "+"; // Middle rules
+  string right_intersection_char        = "+";
+  string intersection_char              = "+";
+  string top_left_intersection_char     = "+";
+  string top_right_intersection_char    = "+";
+  string top_intersection_char          = "+";
+  string bottom_left_intersection_char  = "+";
+  string bottom_right_intersection_char = "+";
+  string bottom_intersection_char       = "+";
+  string boundary_pad_char              = " ";
+  string pad_char                       = " ";
 
 
   // The column titles are store in a two dimensional queue to allow for
@@ -93,7 +49,7 @@ class txt_tbl;
     columns.push_back(ci);
     num_header_rows = max(num_header_rows, ci.title_lines.size());
     adjust_all_column_header_rows();
-  endfunction : add_column
+  endfunction
 
   virtual function string get_header();
     get_header = "";
@@ -104,12 +60,62 @@ class txt_tbl;
         get_header = {get_header, get_wrapped_column_title(i, j)};
       end
     end
-  endfunction : get_header
+  endfunction
 
+  // Returns a middle horizontal rule (e.g. between the header and the rows).
+  // Same as get_border_middle(); kept for backward compatibility.
   virtual function string get_border();
-    get_border = left_intersection_char;
-    foreach (columns[i]) get_border = {get_border, get_wrapped_column_border(i)};
-  endfunction : get_border
+    return get_border_middle();
+  endfunction
+
+  // Returns the horizontal rule for the top of the table.
+  virtual function string get_border_top();
+    return get_border_with(top_left_intersection_char, top_intersection_char, top_right_intersection_char);
+  endfunction
+
+  // Returns a horizontal rule for within the table (e.g. between the header and the rows).
+  virtual function string get_border_middle();
+    return get_border_with(left_intersection_char, intersection_char, right_intersection_char);
+  endfunction
+
+  // Returns the horizontal rule for the bottom of the table.
+  virtual function string get_border_bottom();
+    return get_border_with(bottom_left_intersection_char, bottom_intersection_char,
+                           bottom_right_intersection_char);
+  endfunction
+
+  // Sets all of the border characters from the given style, for example:
+  //   txt_tbl_unicode_border_style style = new();
+  //   tbl.set_border_style(style);
+  // The characters are copied, so individual characters can still be changed afterwards.
+  // A null style leaves the border characters unchanged.
+  virtual function void set_border_style(txt_tbl_border_style style);
+    if (style == null) return;
+    set_border_chars(style.horizontal(), style.vertical(),
+                     style.top_left(), style.top(), style.top_right(),
+                     style.middle_left(), style.middle(), style.middle_right(),
+                     style.bottom_left(), style.bottom(), style.bottom_right());
+  endfunction
+
+  // Sets all of the border characters, except for the padding characters.
+  virtual function void set_border_chars(string horizontal, string vertical,
+                                         string top_left, string top, string top_right,
+                                         string mid_left, string mid, string mid_right,
+                                         string bottom_left, string bottom, string bottom_right);
+    horizontal_border_char         = horizontal;
+    left_border_char               = vertical;
+    right_border_char              = vertical;
+    vertical_border_char           = vertical;
+    top_left_intersection_char     = top_left;
+    top_intersection_char          = top;
+    top_right_intersection_char    = top_right;
+    left_intersection_char         = mid_left;
+    intersection_char              = mid;
+    right_intersection_char        = mid_right;
+    bottom_left_intersection_char  = bottom_left;
+    bottom_intersection_char       = bottom;
+    bottom_right_intersection_char = bottom_right;
+  endfunction
 
   virtual function string get_row(string column_fields[$]);
     int   num_cols = max(column_fields.size(), columns.size());
@@ -120,41 +126,50 @@ class txt_tbl;
       if (i >= columns.size()) add_column("?");
       get_row = {get_row, get_wrapped_column_field(i, f)};
     end
-  endfunction : get_row
+  endfunction
 
   static function int max(int a, int b);
     return (a > b) ? a : b;
-  endfunction : max
+  endfunction
 
   protected virtual function bit is_last_column(int col_idx);
     return col_idx >= (columns.size() - 1);
-  endfunction : is_last_column
+  endfunction
 
   protected virtual function string get_wrapped_column_txt(int col_idx, string txt);
     string end_char = is_last_column(col_idx) ? right_border_char : vertical_border_char;
-    return {boundry_pad_char, txt, boundry_pad_char, end_char};
-  endfunction : get_wrapped_column_txt
+    return {boundary_pad_char, txt, boundary_pad_char, end_char};
+  endfunction
 
   protected virtual function string get_wrapped_column_title(int col_idx, int title_row_idx);
     string hdr_line = columns[col_idx].title_lines[title_row_idx];
     hdr_line = get_resized_justified_txt(col_idx, hdr_line, columns[col_idx].left_justify_title);
     return get_wrapped_column_txt(col_idx, hdr_line);
-  endfunction : get_wrapped_column_title
+  endfunction
 
-  protected virtual function string get_wrapped_column_border(int col_idx);
-    string end_char = is_last_column(col_idx) ? right_intersection_char : intersection_char;
+  // Returns a horizontal rule that starts with 'left_char', has 'inner_char' between columns, and ends
+  // with 'right_char'.
+  protected virtual function string get_border_with(string left_char, string inner_char, string right_char);
+    get_border_with = left_char;
+    foreach (columns[i]) begin
+      get_border_with = {get_border_with, get_wrapped_column_border(i, inner_char, right_char)};
+    end
+  endfunction
+
+  protected virtual function string get_wrapped_column_border(int col_idx, string inner_char, string right_char);
+    string end_char = is_last_column(col_idx) ? right_char : inner_char;
     return {horizontal_border_char, get_horizontal_col_border(get_column_width(col_idx, 0)),
             horizontal_border_char, end_char};
-  endfunction : get_wrapped_column_border
+  endfunction
 
   protected virtual function string get_wrapped_column_field(int col_idx, string field);
     string f = get_resized_justified_txt(col_idx, field, columns[col_idx].left_justify_field);
     return get_wrapped_column_txt(col_idx, f);
-  endfunction : get_wrapped_column_field
+  endfunction
 
   protected virtual function string get_horizontal_col_border(int size);
     return {size{horizontal_border_char}}; // repeat 'horizontal_border_char' 'size' times
-  endfunction : get_horizontal_col_border
+  endfunction
 
   protected virtual function string get_resized_justified_txt(int col_idx, string txt, bit left_justify=0);
     int     width     = get_column_width(col_idx, txt.len());
@@ -164,13 +179,14 @@ class txt_tbl;
     get_resized_justified_txt = {left_justify ? "" : pad,
                                  txt,
                                  left_justify ? pad : ""};
-  endfunction : get_resized_justified_txt
+  endfunction
 
   protected virtual function int get_column_width(int col_idx, int txt_len_to_fit);
     return columns[col_idx].get_width(txt_len_to_fit);
-  endfunction : get_column_width
+  endfunction
 
   protected virtual function void adjust_all_column_header_rows();
     foreach (columns[i]) columns[i].prepend_blank_title_lines(num_header_rows);
-  endfunction : adjust_all_column_header_rows
-endclass : txt_tbl
+  endfunction
+
+endclass
