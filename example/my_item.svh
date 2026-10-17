@@ -32,10 +32,10 @@ class my_item extends uvm_sequence_item;
   rand my_enum_t c;
 
   `uvm_object_utils_begin(my_item)
-    `uvm_field_string(ifc, UVM_ALL_ON)
-    `uvm_field_int(a, UVM_ALL_ON)
-    `uvm_field_int(b, UVM_ALL_ON)
-    `uvm_field_enum(my_enum_t, c, UVM_ALL_ON)
+    `uvm_field_string(ifc, UVM_ALL_ON | UVM_STRING)
+    `uvm_field_int(a, UVM_ALL_ON | UVM_HEX)
+    `uvm_field_int(b, UVM_ALL_ON | UVM_DEC)
+    `uvm_field_enum(my_enum_t, c, UVM_ALL_ON | UVM_ENUM)
   `uvm_object_utils_end
 
   function new(string name="my_item");

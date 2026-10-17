@@ -51,8 +51,14 @@ class my_env extends uvm_env;
   endfunction
 
   protected virtual function void factory_overrides();
-    // Use the factory to override the default type created by the monitor
-    // with the type that the table_logger can use.
+    // This example shows how the source code for an item does not need to be
+    // modified to be used with the logger.  A project that wishes to use the
+    // table logger can use an existing Verification IP or other existing Agent
+    // without modifying the existing source code.
+    // Here, the my_table_item implements the table logging requirements for
+    // my_item.  The UVM Factory is used to get the existing Verification IP or
+    // other existing Agent to spit out our table-logging-enabled item instead
+    // of the original table-unaware item.
     set_type_override_by_type(my_item::get_type(), my_table_item::get_type());
   endfunction
 
@@ -62,12 +68,18 @@ class my_env extends uvm_env;
   endfunction
 
   protected virtual function void configure_logger();
+    txt_tbl_pkg::txt_tbl_unicode_border_style style = new();
     log_cfg = table_logger_pkg::table_logger_cfg::type_id::create("cfg", this);
     log_cfg.log_file_name = "my_log.log";
+    log_cfg.border_style = style;
+    log_cfg.col_width["line"] = 3;
+    log_cfg.col_width["time"] = 8;
     log_cfg.col_width["ifc"] = 1;
     log_cfg.set_col_width_for_hex("a", 32);
     log_cfg.set_col_width_for_dec_bits("b", 32);
     log_cfg.col_width["c"] = table_logger_pkg::enum_width_finder#(my_enum_t)::get_max_width();
+    log_cfg.set_col_title_vertical("line", "Line");
+    log_cfg.set_col_title_vertical("time", "Time");
     log_cfg.set_col_title_vertical("ifc", "Interface");
     log_cfg.col_title["a"] = "Value A\n(hex)";
     log_cfg.col_title["b"] = "Value B\n(decimal)";

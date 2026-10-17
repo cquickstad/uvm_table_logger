@@ -32,18 +32,6 @@
 // 5. Connect your monitor's analysis port to the table_logger's analysis_export in the connect_phase.
 
 
-typedef string rows_of_log_fields_t[][string]; // Return type for T_CAST.get_log_table()
-
-// A dummy object needed because the default type for T_CAST type requires log_fields[] and get_log_table().
-class dummy_tbl_txn;
-  static string log_fields[] = {"column1", "column2"};
-  virtual function rows_of_log_fields_t get_log_table();
-    string s[string] = '{"column1": "value a", "column2": "value b"};
-    return {s}; // Return only a single row.
-  endfunction
-endclass
-
-
 // The dual types in the template arguments allow you to use a transaction object that may not be natively
 // compatible with the table_logger (i.e. it may not have log_fields[] or get_log_table()).
 // T_CAST must be a child of T_SUBSCRIBER or the same type as T_SUBSCRIBER.
@@ -107,6 +95,7 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
   endfunction
 
   protected virtual function void configure_table();
+    tt.set_border_style(cfg.border_style);
     foreach (fields[i]) configure_column(i);
   endfunction
 
@@ -138,9 +127,9 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
   endfunction
 
   protected virtual function void print_header();
-    log(tt.get_border());
+    log(tt.get_border_top());
     log(tt.get_header());
-    log(tt.get_border());
+    log(tt.get_border_middle());
   endfunction
 
   protected virtual function void log_txn();

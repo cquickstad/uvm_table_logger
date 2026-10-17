@@ -20,6 +20,18 @@
 // Look for the latest version of this code at:
 //  https://github.com/cquickstad/uvm_table_logger.git
 
+
+// This example shows how the source code for the item does not need to be
+// modified to be used with the logger.  A project that wishes to use the table
+// logger can use an existing Verification IP or other existing Agent without
+// modifying the existing source code.  Simply:
+// * Inherit from the item you wish to log.
+// * Implement `static string log_fields[]`
+// * Implement `virtual function rows_of_log_fields_t get_log_table()`
+// * Use a UVM Factory override to have the existing code create your new child
+//   item instead of the original item.
+// * Complete the normal environment/configuration steps (table_logger_cfg and
+//   analysis port connection).
 class my_table_item extends my_item;
 
   `uvm_object_utils(my_table_item)

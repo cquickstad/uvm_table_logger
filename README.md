@@ -74,5 +74,38 @@ class my_env extends uvm_env;
 endclass
 ```
 
+## Border styles
+The table borders are drawn in ASCII by default.  Set `table_logger_cfg.border_style` to a border style object to use
+Unicode box-drawing characters instead.  The border style classes are in `txt_tbl_pkg`, which `table_logger_pkg.sv`
+includes, so either `import txt_tbl_pkg::*;` or use the `txt_tbl_pkg::` prefix:
+```
+txt_tbl_pkg::txt_tbl_unicode_border_style style = new();
+log_cfg.border_style = style;
+```
+
+| Border style class                     | Result      |
+|----------------------------------------|-------------|
+| (none) or `txt_tbl_ascii_border_style` | `+---+---+` |
+| `txt_tbl_unicode_border_style`         | `┌───┬───┐` |
+| `txt_tbl_unicode_heavy_border_style`   | `┏━━━┳━━━┓` |
+| `txt_tbl_unicode_double_border_style`  | `╔═══╦═══╗` |
+
+The Unicode styles write UTF-8, so view the log with a UTF-8 capable viewer/terminal.  (In the source, the box-drawing
+characters are written as octal escapes rather than literal UTF-8 characters for simulator compatibility.)
+
+To make a custom style, extend `txt_tbl_border_style` (or one of the styles above) and override its functions.  For
+example, light lines with rounded corners:
+```
+class rounded_border_style extends txt_tbl_pkg::txt_tbl_unicode_border_style;
+  virtual function string top_left();     return "\342\225\255"; endfunction
+  virtual function string top_right();    return "\342\225\256"; endfunction
+  virtual function string bottom_right(); return "\342\225\257"; endfunction
+  virtual function string bottom_left();  return "\342\225\260"; endfunction
+endclass
+```
+
+`txt_tbl` provides `get_border_top()`, `get_border_middle()`, and `get_border_bottom()` so that each horizontal rule
+uses the matching corner/intersection characters.  (`get_border()` is the same as `get_border_middle()`.)
+
 ## Example
 See the `example` directory for a complete simple UVM testbench that uses the table logger.

@@ -28,6 +28,14 @@ class table_logger_cfg extends uvm_object;
   // The value to place in a table location when that field is otherwise empty.
   string empty_field_value = "-";
 
+  // The characters used to draw the table borders.  When null (the default), ASCII is used.
+  // For example:
+  //   txt_tbl_pkg::txt_tbl_unicode_border_style style = new(); // or txt_tbl_unicode_heavy_border_style,
+  //   cfg.border_style = style;                                //    txt_tbl_unicode_double_border_style
+  // The Unicode styles write UTF-8 box-drawing characters, so view the log with a UTF-8 capable viewer.
+  // A custom style can be made by extending txt_tbl_border_style.
+  txt_tbl_border_style border_style;
+
   bit col_en[string];
   int col_width[string];
   string col_title[string];
@@ -71,7 +79,7 @@ class table_logger_cfg extends uvm_object;
   // Reminder: the number of bits of a type can be obtained with $bits().
   // For example: set_col_width_for_dec_bits(.column_tag("my_column"),.bit_width($bits(my_type_t)))
   virtual function void set_col_width_for_dec_bits(string column_tag, int bit_width);
-    longint max_value = (128'b1 << bit_width) - 1;
+    bit [1023:0] max_value = (1024'b1 << bit_width) - 1;
     col_width[column_tag] = get_dec_str_width(max_value);
   endfunction
 
@@ -92,8 +100,11 @@ class table_logger_cfg extends uvm_object;
 
   // Helper to determine the column width for a field to be printed as an integer
   // decimal given the maximum value expected to be represented.
-  static function int get_dec_str_width(int max_value);
-    return  $rtoi($log10(max_value)) + 1;
+  // Counts digits directly: $log10() fails for values that do not fit in an
+  // int, and real-number rounding is inexact near powers of 10.
+  static function int get_dec_str_width(bit [1023:0] max_value);
+    string s = $sformatf("%0d", max_value);
+    return s.len();
   endfunction
 
   localparam NUM_BITS_PER_HEX_CHARACTER = 4;
