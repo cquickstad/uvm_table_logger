@@ -107,6 +107,10 @@ log_cfg.border_style = style;
 │    2 │   20 │  1a3 │   60 │
 ```
 
+The logger writes the top rule and the header at the start of simulation, then writes each row as its transaction
+arrives.  It does not write a bottom rule, so the table is left open after the last row.  (The `bottom*()` characters
+of a style are used only when calling `txt_tbl.get_border_bottom()` directly.)
+
 The Unicode styles write UTF-8, so view the log with a UTF-8 capable viewer/terminal.  (In the source, the box-drawing
 characters are written as octal escapes rather than literal UTF-8 characters for simulator compatibility.)
 
