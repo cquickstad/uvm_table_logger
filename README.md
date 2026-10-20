@@ -80,26 +80,6 @@ endpackage
    endclass
    ```
 3. Instantiate a `table_logger_cfg` instance (or a child of it), specify the log configuration, and add it to the `uvm_config_db`.  The logger gets it in its `connect_phase` with the field name `"cfg"`, so set it with field name `"cfg"` and an instance path that matches the logger's instance name from step 4 (`"logger"` here).
-   ```systemverilog
-   class my_env extends uvm_env;
-     ...
-     table_logger_cfg log_cfg;
-     ...
-     virtual function void build_phase(uvm_phase phase);
-       ...
-       log_cfg = table_logger_cfg::type_id::create("log_cfg", this);
-       log_cfg.log_file_name = "bus.log";
-       log_cfg.col_title["column_a_tag"] = "Column\nA";
-       log_cfg.col_title["column_b_tag"] = "Column\nB";
-       log_cfg.col_title["column_c_tag"] = "Column\nC";
-       log_cfg.col_width["column_b_tag"] = 20;
-       // "logger" must match the logger's instance name (step 4).  The field name must be "cfg".
-       uvm_config_db#(table_logger_cfg)::set(this, "logger", "cfg", log_cfg);
-       ...
-     endfunction
-     ...
-   endclass
-   ```
 4. Instantiate a `table_logger` instance (or a child of it).  It takes two type parameters,
    `table_logger#(T_CAST, T_SUBSCRIBER)`:
    * `T_SUBSCRIBER` is the type that the monitor's analysis port writes.
@@ -110,32 +90,47 @@ endpackage
    transaction without modifying its source (for example, from third-party VIP), extend it with `log_fields` and
    `get_log_table()`, use a factory override so the monitor creates the child, and use
    `table_logger#(my_table_txn, my_txn)`.  The `example` directory does this.
-   ```systemverilog
-   class my_env extends uvm_env;
-     ...
-     table_logger#(my_txn, my_txn) logger;
-     ...
-     virtual function void build_phase(uvm_phase phase);
-       ...
-       // The name must match the uvm_config_db path used for the cfg (step 3). 
-       logger = table_logger#(my_txn, my_txn)::type_id::create("logger", this);
-       ...
-     endfunction
-     ...
-   endclass
-   ```
 5. Connect your monitor's analysis port to `table_logger.analysis_export` in the `connect_phase`.
-   ```systemverilog
-   class my_env extends uvm_env;
-     ...
-     virtual function void connect_phase(uvm_phase phase);
-       ...
-       agent.monitor.ap.connect(logger.analysis_export);
-       ...
-     endfunction
-     ...
-   endclass
-   ```
+
+Steps 3–5 together in an environment:
+```systemverilog
+class my_env extends uvm_env;
+  `uvm_component_utils(my_env)
+
+  my_agent                      agent;
+  table_logger_cfg              log_cfg;
+  table_logger#(my_txn, my_txn) logger;
+
+  function new(string name="my_env", uvm_component parent=null);
+    super.new(name, parent);
+  endfunction
+
+  virtual function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    agent = my_agent::type_id::create("agent", this);
+
+    // Step 3: Configure the logger
+    log_cfg = table_logger_cfg::type_id::create("log_cfg", this);
+    log_cfg.log_file_name = "bus.log";
+    log_cfg.col_title["column_a_tag"] = "Column\nA";
+    log_cfg.col_title["column_b_tag"] = "Column\nB";
+    log_cfg.col_title["column_c_tag"] = "Column\nC";
+    log_cfg.col_width["column_b_tag"] = 20;
+    // "logger" must match the logger's instance name (step 4).  The field name must be "cfg".
+    uvm_config_db#(table_logger_cfg)::set(this, "logger", "cfg", log_cfg);
+
+    // Step 4: Create the logger
+    // The name must match the uvm_config_db path used for the cfg (step 3).
+    logger = table_logger#(my_txn, my_txn)::type_id::create("logger", this);
+  endfunction
+
+  virtual function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    // Step 5: Connect the monitor to the logger
+    agent.monitor.ap.connect(logger.analysis_export);
+  endfunction
+endclass
+```
 
 ## Configuration
 All configuration is in `table_logger_cfg`.  The `col_*` settings are associative arrays indexed by column tag (the
