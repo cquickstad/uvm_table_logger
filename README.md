@@ -83,12 +83,28 @@ txt_tbl_pkg::txt_tbl_unicode_border_style style = new();
 log_cfg.border_style = style;
 ```
 
-| Border style class                     | Result      |
-|----------------------------------------|-------------|
-| (none) or `txt_tbl_ascii_border_style` | `+---+---+` |
-| `txt_tbl_unicode_border_style`         | `┌───┬───┐` |
-| `txt_tbl_unicode_heavy_border_style`   | `┏━━━┳━━━┓` |
-| `txt_tbl_unicode_double_border_style`  | `╔═══╦═══╗` |
+| Border style class                           | Result      |
+|----------------------------------------------|-------------|
+| (none) or `txt_tbl_ascii_border_style`       | `+---+---+` |
+| `txt_tbl_unicode_border_style`               | `┌───┬───┐` |
+| `txt_tbl_unicode_heavy_border_style`         | `┏━━━┳━━━┓` |
+| `txt_tbl_unicode_double_border_style`        | `╔═══╦═══╗` |
+| `txt_tbl_unicode_double_header_border_style` | `╒═══╤═══╕` |
+
+`txt_tbl_unicode_double_header_border_style` sets the header apart from the rows with double horizontal lines, and
+uses light lines everywhere else:
+```
+txt_tbl_pkg::txt_tbl_unicode_double_header_border_style style = new();
+log_cfg.border_style = style;
+```
+```
+╒══════╤═══════╤══════╕
+│ time │ addr  │ data │
+╞══════╪═══════╪══════╡
+│ 10   │ 0x1a2 │ 0x5f │
+│ 20   │ 0x1a3 │ 0x60 │
+└──────┴───────┴──────┘
+```
 
 The Unicode styles write UTF-8, so view the log with a UTF-8 capable viewer/terminal.  (In the source, the box-drawing
 characters are written as octal escapes rather than literal UTF-8 characters for simulator compatibility.)
@@ -104,8 +120,10 @@ class rounded_border_style extends txt_tbl_pkg::txt_tbl_unicode_border_style;
 endclass
 ```
 
-`txt_tbl` provides `get_border_top()`, `get_border_middle()`, and `get_border_bottom()` so that each horizontal rule
-uses the matching corner/intersection characters.  (`get_border()` is the same as `get_border_middle()`.)
+`txt_tbl` provides `get_border_top()`, `get_border_header()`, `get_border_middle()`, and `get_border_bottom()` so that
+each horizontal rule uses the matching corner/intersection characters.  (`get_border()` is the same as
+`get_border_middle()`.)  To give the header its own look in a custom style, override the `header_*()` functions of
+`txt_tbl_border_style`.
 
 ## Example
 See the `example` directory for a complete simple UVM testbench that uses the table logger.
