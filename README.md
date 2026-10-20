@@ -27,7 +27,7 @@ An abstract generic logger that logs UVM transactions from a monitor in an attra
      ...
    endclass
    ```
-3. Instantiate a `table_logger_cfg` instance (or a child of it), specify the log configuration, and add it to the `uvm_config_db`.
+3. Instantiate a `table_logger_cfg` instance (or a child of it), specify the log configuration, and add it to the `uvm_config_db`.  The logger gets it in its `connect_phase` with the field name `"cfg"`, so set it with field name `"cfg"` and an instance path that matches the logger's instance name from step 4 (`"logger"` here).
    ```systemverilog
    class my_env extends uvm_env;
      ...
@@ -41,6 +41,7 @@ An abstract generic logger that logs UVM transactions from a monitor in an attra
        log_cfg.col_title["column_b_tag"] = "Column\nB";
        log_cfg.col_title["column_c_tag"] = "Column\nC";
        log_cfg.col_width["column_b_tag"] = 20;
+       // "logger" must match the logger's instance name (step 4).  The field name must be "cfg".
        uvm_config_db#(table_logger_cfg)::set(this, "logger", "cfg", log_cfg);
        ...
      endfunction
@@ -55,6 +56,7 @@ An abstract generic logger that logs UVM transactions from a monitor in an attra
      ...
      virtual function void build_phase(uvm_phase phase);
        ...
+       // The name must match the uvm_config_db path used for the cfg (step 3). 
        logger = table_logger#(my_txn, my_txn)::type_id::create("logger", this);
        ...
      endfunction
