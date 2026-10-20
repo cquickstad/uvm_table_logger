@@ -30,6 +30,7 @@ package txt_tbl_pkg;
   `include "txt_tbl_unicode_border_style.sv"
   `include "txt_tbl_unicode_heavy_border_style.sv"
   `include "txt_tbl_unicode_double_border_style.sv"
+  `include "txt_tbl_unicode_double_header_border_style.sv"
   `include "txt_tbl.sv"
 
 endpackage

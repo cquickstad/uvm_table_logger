@@ -34,4 +34,14 @@ virtual class txt_tbl_border_style;
   pure virtual function string bottom_left();   // Bottom rule
   pure virtual function string bottom();
   pure virtual function string bottom_right();
+
+  // Header characters.  The top rule and the header lines use header_horizontal() and header_vertical(),
+  // and the rule between the header and the rows uses header_horizontal() and header_left(),
+  // header_middle() and header_right().  By default the header looks like the rest of the table; override
+  // these to give the header its own look.
+  virtual function string header_horizontal(); return horizontal();   endfunction
+  virtual function string header_vertical();   return vertical();     endfunction
+  virtual function string header_left();       return middle_left();  endfunction
+  virtual function string header_middle();     return middle();       endfunction
+  virtual function string header_right();      return middle_right(); endfunction
 endclass
