@@ -11,6 +11,36 @@ For example:
 │    3 │ 2249000 │   X │      2ec7cf25 │ FIRST_ENUM_VALUE │
 ```
 
+## Setup
+### Requirements
+* A SystemVerilog simulator with UVM.  The example runs on Xcelium (UVM 1.2) and Verilator (UVM IEEE 1800.2-2020).
+
+### Get the code
+```sh
+git clone https://github.com/cquickstad/uvm_table_logger.git
+```
+The `txt_tbl` directory (from [txt_tbl](https://github.com/cquickstad/txt_tbl)) is a
+[git-subrepo](https://github.com/ingydotnet/git-subrepo), so its files are already in this repository.  No submodule
+commands are needed.
+
+### Compile
+1. Add the repository directory and its `txt_tbl` directory to the include path.
+2. Compile `table_logger_pkg.sv` after `uvm_pkg` and before your package that uses it.  It includes `txt_tbl_pkg.sv`,
+   so you don't need to compile that separately.
+
+For example, with Xcelium:
+```sh
+xrun -sv -uvm \
+  -incdir <path>/uvm_table_logger \
+  -incdir <path>/uvm_table_logger/txt_tbl \
+  <path>/uvm_table_logger/table_logger_pkg.sv \
+  my_pkg.sv \
+  top.sv
+```
+With Verilator, the equivalent options are `+incdir+<path>/uvm_table_logger` and
+`+incdir+<path>/uvm_table_logger/txt_tbl`.  See `example/run.sh` (Xcelium) and `example/verilator_run.sh` (Verilator)
+for complete command lines.
+
 ## To use:
 `table_logger`, `table_logger_cfg`, and `rows_of_log_fields_t` are in `table_logger_pkg`.  The code below assumes
 that the package where it lives imports it:
