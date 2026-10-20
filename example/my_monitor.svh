@@ -29,9 +29,12 @@ class my_monitor extends uvm_monitor;
 
   string ifc;
 
+  // The UVM field macros expand to code that Verilator width-warns about.
+  // verilator lint_off WIDTH
   `uvm_component_utils_begin(my_monitor)
     `uvm_field_string(ifc, UVM_ALL_ON)
   `uvm_component_utils_end
+  // verilator lint_on WIDTH
 
   function new(string name="my_monitor", uvm_component parent=null);
     super.new(name, parent);

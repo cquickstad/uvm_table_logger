@@ -44,6 +44,8 @@ class table_logger_cfg extends uvm_object;
   bit col_field_left_justify[string];
   bit col_sticky_width_growth[string];
 
+  // The UVM field macros expand to code that Verilator width-warns about.
+  // verilator lint_off WIDTH
   `uvm_object_utils_begin(table_logger_cfg)
     `uvm_field_aa_int_string(col_en, UVM_ALL_ON)
     `uvm_field_aa_int_string(col_width, UVM_ALL_ON)
@@ -52,6 +54,7 @@ class table_logger_cfg extends uvm_object;
     `uvm_field_aa_int_string(col_field_left_justify, UVM_ALL_ON)
     `uvm_field_aa_int_string(col_sticky_width_growth, UVM_ALL_ON)
   `uvm_object_utils_end
+  // verilator lint_on WIDTH
 
   function new(string name="table_logger_cfg");
     super.new(name);

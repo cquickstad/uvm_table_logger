@@ -31,12 +31,15 @@ class my_item extends uvm_sequence_item;
   rand reg [31:0] b;
   rand my_enum_t c;
 
+  // The UVM field macros expand to code that Verilator width-warns about.
+  // verilator lint_off WIDTH
   `uvm_object_utils_begin(my_item)
     `uvm_field_string(ifc, UVM_ALL_ON | UVM_STRING)
     `uvm_field_int(a, UVM_ALL_ON | UVM_HEX)
     `uvm_field_int(b, UVM_ALL_ON | UVM_DEC)
     `uvm_field_enum(my_enum_t, c, UVM_ALL_ON | UVM_ENUM)
   `uvm_object_utils_end
+  // verilator lint_on WIDTH
 
   function new(string name="my_item");
     super.new(name);
