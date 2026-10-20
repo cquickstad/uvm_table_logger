@@ -1,6 +1,16 @@
 # uvm_table_logger
 An abstract generic logger that logs UVM transactions from a monitor in an attractive, well-formatted, and highly configurable text table.
 
+For example:
+```text
+╒══════╤═════════╤═════╤═══════════════╤══════════════════╕
+│ Line │    Time │ Ifc │ Value A (hex) │          Value C │
+╞══════╪═════════╪═════╪═══════════════╪══════════════════╡
+│    1 │ 1649000 │   X │      9f3070b3 │  LAST_ENUM_VALUE │
+│    2 │ 2049000 │   Y │      6f1d78ed │ THIRD_ENUM_VALUE │
+│    3 │ 2249000 │   X │      2ec7cf25 │ FIRST_ENUM_VALUE │
+```
+
 ## To use:
 `table_logger`, `table_logger_cfg`, and `rows_of_log_fields_t` are in `table_logger_pkg`.  The code below assumes
 that the package where it lives imports it:
