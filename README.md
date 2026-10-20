@@ -41,7 +41,7 @@ With Verilator, the equivalent options are `+incdir+<path>/uvm_table_logger` and
 `+incdir+<path>/uvm_table_logger/txt_tbl`.  See `example/run.sh` (Xcelium) and `example/verilator_run.sh` (Verilator)
 for complete command lines.
 
-## To use:
+## Quick start
 `table_logger`, `table_logger_cfg`, and `rows_of_log_fields_t` are in `table_logger_pkg`.  The code below assumes
 that the package where it lives imports it:
 ```systemverilog
