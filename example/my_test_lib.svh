@@ -43,12 +43,12 @@ class rand_test extends my_test_base;
     phase.raise_objection(this);
     `uvm_info(get_name(), "Starting test", UVM_LOW)
 
-    if (!this.randomize()) `uvm_fatal("TEST_RAND", "Failed to randomize rand_test")
+    if (this.randomize() == '0) `uvm_fatal("TEST_RAND", "Failed to randomize rand_test")
 
     repeat (num_seq) begin
       vseq = rand_vseq::type_id::create("seq");
       init_vseq(vseq);
-      if (!vseq.randomize()) `uvm_fatal("SEQ_RAND", "Failed to randomize rand_vseq")
+      if (vseq.randomize() == '0) `uvm_fatal("SEQ_RAND", "Failed to randomize rand_vseq")
       vseq.start(null);
     end
 

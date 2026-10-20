@@ -36,7 +36,7 @@ class random_seq extends my_sequence_base;
     #(delay_ns * 1ns);
     req = my_item::type_id::create("req");
     start_item(req);
-    if (!req.randomize()) `uvm_fatal("ITEM_RAND", "Failed to randomize my_item.")
+    if (req.randomize() == '0) `uvm_fatal("ITEM_RAND", "Failed to randomize my_item.")
     finish_item(req);
   endtask
 

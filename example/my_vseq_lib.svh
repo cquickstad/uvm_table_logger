@@ -34,7 +34,7 @@ class rand_vseq extends my_vseq_base;
   virtual task body();
     random_seq s = random_seq::type_id::create("s");
     #(delay * 1ns);
-    if (!s.randomize()) `uvm_fatal("SEQ_RAND", "Failed to randomize random_seq.")
+    if (s.randomize() == '0) `uvm_fatal("SEQ_RAND", "Failed to randomize random_seq.")
     start_on_sqr(s);
   endtask
 
