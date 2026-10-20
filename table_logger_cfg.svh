@@ -88,7 +88,7 @@ class table_logger_cfg extends uvm_object;
   // given the maximum value expected to be represented.
   // For example: set_col_width_for_dec_max(.column_tag("things"),.max_value(`NUMBER_OF_THINGS))
   virtual function void set_col_width_for_dec_max(string column_tag, int max_value);
-    col_width[column_tag] = get_dec_str_width(max_value);
+    col_width[column_tag] = get_dec_str_width(1024'(max_value));
   endfunction
 
   // Helper to set the column width for a field to be printed in hexadecimal
