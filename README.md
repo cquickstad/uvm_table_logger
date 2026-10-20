@@ -70,7 +70,16 @@ endpackage
      ...
    endclass
    ```
-4. Instantiate a `table_logger` instance (or a child of it).
+4. Instantiate a `table_logger` instance (or a child of it).  It takes two type parameters,
+   `table_logger#(T_CAST, T_SUBSCRIBER)`:
+   * `T_SUBSCRIBER` is the type that the monitor's analysis port writes.
+   * `T_CAST` is the type that has `log_fields` and `get_log_table()`.  Each item received is `$cast` to it (a failed
+     cast is a `uvm_fatal`), so it must be `T_SUBSCRIBER` or a child of it.
+
+   When your transaction has `log_fields` and `get_log_table()` itself, use it for both, as below.  To log an existing
+   transaction without modifying its source (for example, from third-party VIP), extend it with `log_fields` and
+   `get_log_table()`, use a factory override so the monitor creates the child, and use
+   `table_logger#(my_table_txn, my_txn)`.  The `example` directory does this.
    ```systemverilog
    class my_env extends uvm_env;
      ...
