@@ -2,6 +2,18 @@
 An abstract generic logger that logs UVM transactions from a monitor in an attractive, well-formatted, and highly configurable text table.
 
 ## To use:
+`table_logger`, `table_logger_cfg`, and `rows_of_log_fields_t` are in `table_logger_pkg`.  The code below assumes
+that the package where it lives imports it:
+```systemverilog
+package my_pkg;
+  import uvm_pkg::*;
+  `include "uvm_macros.svh"
+  import table_logger_pkg::*;
+  ...
+endpackage
+```
+(Otherwise, use the `table_logger_pkg::` prefix, as the `example` directory does.)
+
 1. Add a static array of strings named `log_fields` to your transaction object to indicate the table fields/columns and the order of those columns in the table.  (These strings define unique tags for the columns. The actual descriptive names that appear in the log file will be determined by `table_logger_cfg.col_title`.)
    ```systemverilog
    class my_txn extends uvm_object;
