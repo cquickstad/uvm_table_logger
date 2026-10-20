@@ -137,6 +137,49 @@ endpackage
    endclass
    ```
 
+## Configuration
+All configuration is in `table_logger_cfg`.  The `col_*` settings are associative arrays indexed by column tag (the
+strings in `log_fields`).  A column that has no entry uses the default.
+
+The order of the columns in the table is set by the order of the tags in the transaction's
+`static string log_fields[]`, not by `table_logger_cfg`.  To reorder the columns, reorder the tags in `log_fields`.
+
+The logger adds two columns, with tags `"line"` and `"time"`, before the columns in `log_fields`.  `line` counts the rows
+logged, starting at 1, and `time` is `$time` when the row was logged.  They can be configured like any other column.
+
+| Setting                            | Default             | Description                                                    |
+|------------------------------------|---------------------|----------------------------------------------------------------|
+| `log_file_name`                    | `"file_name.log"`   | The file the table is written to.                              |
+| `empty_field_value`                | `"-"`               | Written for a field that `get_log_table()` didn't set.         |
+| `border_style`                     | `null` (ASCII)      | The characters used to draw the borders.  See [Border styles](#border-styles). |
+| `col_en[tag]`                      | `1`                 | `0` leaves the column out of the table.                        |
+| `col_title[tag]`                   | the tag             | The column title.  `"\n"` starts a new title line.             |
+| `col_width[tag]`                   | `0`                 | The minimum column width.  The column is never narrower than its title. |
+| `col_title_left_justify[tag]`      | `0` (right-justify) | `1` left-justifies the title.                                  |
+| `col_field_left_justify[tag]`      | `0` (right-justify) | `1` left-justifies the fields.                                 |
+| `col_sticky_width_growth[tag]`     | `1`                 | When a field is wider than its column, the field is written in full and the row is misaligned.  With `1`, the column stays at the new width for later rows; with `0`, it goes back to its width for later rows. |
+
+Fields are never truncated, so set `col_width` wide enough for the widest value to keep the rows aligned.  Because the
+header is written before any rows, it can't be widened to match.  These helpers set `col_width` (or `col_title`) for
+common cases:
+
+| Helper                                                 | Description                                                        |
+|--------------------------------------------------------|--------------------------------------------------------------------|
+| `set_col_width_for_hex(tag, bit_width)`                | Width of a `bit_width`-bit value in hexadecimal.                   |
+| `set_col_width_for_dec_bits(tag, bit_width)`           | Width of the largest `bit_width`-bit unsigned value in decimal.    |
+| `set_col_width_for_dec_max(tag, max_value)`            | Width of `max_value` in decimal.                                   |
+| `set_col_title_vertical(tag, title)`                   | Writes the title vertically, one character per line.               |
+| `enum_width_finder#(my_enum_t)::get_max_width()`       | The length of the longest name in an enum, to set `col_width` with. |
+
+For example:
+```systemverilog
+log_cfg.col_en["time"] = 0; // Don't log the time
+log_cfg.set_col_width_for_hex("addr", $bits(addr_t));
+log_cfg.col_width["kind"] = enum_width_finder#(kind_t)::get_max_width();
+log_cfg.col_field_left_justify["kind"] = 1;
+log_cfg.set_col_title_vertical("err", "Error");
+```
+
 ## Border styles
 The table borders are drawn in ASCII by default.  Set `table_logger_cfg.border_style` to a border style object to use
 Unicode box-drawing characters instead.  The border style classes are in `txt_tbl_pkg`, which `table_logger_pkg.sv`
