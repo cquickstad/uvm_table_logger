@@ -10,7 +10,7 @@ An abstract generic logger that logs UVM transactions from a monitor in an attra
      ...
    endclass
    ```
-2. Add a `get_log_table()` function (method) to your transaction object that returns the type `rows_of_log_fields_t`.  Populate the return data (rows of fields) to represet the transaction in table format.
+2. Add a `get_log_table()` function (method) to your transaction object that returns the type `rows_of_log_fields_t`.  Populate the return data (rows of fields) to represent the transaction in table format.
    ```systemverilog
    class my_txn extends uvm_object;
      ...
@@ -27,7 +27,7 @@ An abstract generic logger that logs UVM transactions from a monitor in an attra
      ...
    endclass
    ```
-3. Instantiate a `table_logger_cfg` instance (or a child of it), specify the log configuration, and add it to the `vm_config_db`.
+3. Instantiate a `table_logger_cfg` instance (or a child of it), specify the log configuration, and add it to the `uvm_config_db`.
    ```systemverilog
    class my_env extends uvm_env;
      ...
