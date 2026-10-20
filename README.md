@@ -3,7 +3,7 @@ An abstract generic logger that logs UVM transactions from a monitor in an attra
 
 ## To use:
   1. Add a static array of strings named `log_fields` to your transaction object to indicate the table fields/columns and the order of those columns in the table.  (These strings define unique tags for the columns. The actual descriptive names that appear in the log file will be determined by `table_logger_cfg.col_title`.)
-```
+```systemverilog
 class my_txn extends uvm_object;
   ...
   static string log_fields[] = {"column_a_tag", "column_b_tag", "column_c_tag"};
@@ -11,7 +11,7 @@ class my_txn extends uvm_object;
 endclass
 ```
   2. Add a `get_log_table()` function (method) to your transaction object that returns the type `rows_of_log_fields_t`.  Populate the return data (rows of fields) to represet the transaction in table format.
-```
+```systemverilog
 class my_txn extends uvm_object;
   ...
   virtual function rows_of_log_fields_t get_log_table();
@@ -28,7 +28,7 @@ class my_txn extends uvm_object;
 endclass
 ```
   3. Instantiate a `table_logger_cfg` instance (or a child of it), specify the log configuration, and add it to the `vm_config_db`.
-```
+```systemverilog
 class my_env extends uvm_env;
   ...
   table_logger_cfg log_cfg;
@@ -48,7 +48,7 @@ class my_env extends uvm_env;
 endclass
 ```
   4. Instantiate a `table_logger` instance (or a child of it).
-```
+```systemverilog
 class my_env extends uvm_env;
   ...
   table_logger#(my_txn, my_txn) logger;
@@ -62,7 +62,7 @@ class my_env extends uvm_env;
 endclass
 ```
   5. Connect your monitor's analysis port to `table_logger.analysis_export` in the `connect_phase`.
-```
+```systemverilog
 class my_env extends uvm_env;
   ...
   virtual function void connect_phase(uvm_phase phase);
@@ -78,7 +78,7 @@ endclass
 The table borders are drawn in ASCII by default.  Set `table_logger_cfg.border_style` to a border style object to use
 Unicode box-drawing characters instead.  The border style classes are in `txt_tbl_pkg`, which `table_logger_pkg.sv`
 includes, so either `import txt_tbl_pkg::*;` or use the `txt_tbl_pkg::` prefix:
-```
+```systemverilog
 txt_tbl_pkg::txt_tbl_unicode_border_style style = new();
 log_cfg.border_style = style;
 ```
@@ -93,17 +93,16 @@ log_cfg.border_style = style;
 
 `txt_tbl_unicode_double_header_border_style` sets the header apart from the rows with double horizontal lines, and
 uses light lines everywhere else:
-```
+```systemverilog
 txt_tbl_pkg::txt_tbl_unicode_double_header_border_style style = new();
 log_cfg.border_style = style;
 ```
-```
-╒══════╤═══════╤══════╕
-│ time │ addr  │ data │
-╞══════╪═══════╪══════╡
-│ 10   │ 0x1a2 │ 0x5f │
-│ 20   │ 0x1a3 │ 0x60 │
-└──────┴───────┴──────┘
+```text
+╒══════╤══════╤══════╤══════╕
+│ line │ time │ addr │ data │
+╞══════╪══════╪══════╪══════╡
+│    1 │   10 │  1a2 │   5f │
+│    2 │   20 │  1a3 │   60 │
 ```
 
 The Unicode styles write UTF-8, so view the log with a UTF-8 capable viewer/terminal.  (In the source, the box-drawing
@@ -111,7 +110,7 @@ characters are written as octal escapes rather than literal UTF-8 characters for
 
 To make a custom style, extend `txt_tbl_border_style` (or one of the styles above) and override its functions.  For
 example, light lines with rounded corners:
-```
+```systemverilog
 class rounded_border_style extends txt_tbl_pkg::txt_tbl_unicode_border_style;
   virtual function string top_left();     return "\342\225\255"; endfunction
   virtual function string top_right();    return "\342\225\256"; endfunction
