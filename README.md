@@ -236,3 +236,7 @@ each horizontal rule uses the matching corner/intersection characters.  (`get_bo
 
 ## Example
 See the `example` directory for a complete simple UVM testbench that uses the table logger.
+
+## License
+Licensed under the [Apache License, Version 2.0](LICENSE).  The `txt_tbl` directory is also licensed under the Apache
+License, Version 2.0 (see [txt_tbl/LICENSE](txt_tbl/LICENSE)).
