@@ -129,7 +129,7 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
   protected virtual function void print_header();
     log(tt.get_border_top());
     log(tt.get_header());
-    log(tt.get_border_middle());
+    log(tt.get_border_header());
   endfunction
 
   protected virtual function void log_txn();

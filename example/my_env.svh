@@ -68,7 +68,7 @@ class my_env extends uvm_env;
   endfunction
 
   protected virtual function void configure_logger();
-    txt_tbl_pkg::txt_tbl_unicode_border_style style = new();
+    txt_tbl_pkg::txt_tbl_unicode_double_header_border_style style = new();
     log_cfg = table_logger_pkg::table_logger_cfg::type_id::create("cfg", this);
     log_cfg.log_file_name = "my_log.log";
     log_cfg.border_style = style;

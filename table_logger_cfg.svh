@@ -31,7 +31,8 @@ class table_logger_cfg extends uvm_object;
   // The characters used to draw the table borders.  When null (the default), ASCII is used.
   // For example:
   //   txt_tbl_pkg::txt_tbl_unicode_border_style style = new(); // or txt_tbl_unicode_heavy_border_style,
-  //   cfg.border_style = style;                                //    txt_tbl_unicode_double_border_style
+  //   cfg.border_style = style;                                //    txt_tbl_unicode_double_border_style,
+  //                                                            //    txt_tbl_unicode_double_header_border_style
   // The Unicode styles write UTF-8 box-drawing characters, so view the log with a UTF-8 capable viewer.
   // A custom style can be made by extending txt_tbl_border_style.
   txt_tbl_border_style border_style;
