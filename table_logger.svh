@@ -49,6 +49,7 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
   protected int txn_row; // The index of the row being logged within the transaction
   protected string row_q[$];
   protected int line_count = 0;
+  protected int txn_count = 0;
   protected string fields[$];
 
   `uvm_component_param_utils(table_logger#(T_CAST, T_SUBSCRIBER))
@@ -140,6 +141,14 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
       txn_row = r;
       log_row();
     end
+    flush_if_due();
+  endfunction
+
+  protected virtual function void flush_if_due();
+    txn_count++;
+    if (cfg.flush_every_n_txns <= 0) return;
+    if ((txn_count % cfg.flush_every_n_txns) != 0) return;
+    $fflush(fd);
   endfunction
 
   protected virtual function void log_row();

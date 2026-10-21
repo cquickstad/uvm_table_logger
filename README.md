@@ -153,6 +153,7 @@ logged, starting at 1, and `time` is `$time` when the row was logged.  They can 
 | `empty_field_value`                | `"-"`               | Written for a field that `get_log_table()` didn't set.         |
 | `multi_line_empty_field_value`     | `"-"`               | Used instead of `empty_field_value` on the rows after the first row of a multi-row transaction.  `""` leaves them blank. |
 | `line_and_time_on_first_row_only` | `0`                 | `1` writes `line` and `time` only on the first row of a multi-row transaction (the other rows get `multi_line_empty_field_value`), so `line` counts transactions instead of rows. |
+| `flush_every_n_txns`               | `1`                 | Flushes the log file after every N transactions, so the rows survive a simulator crash or kill.  `0` never flushes (a normal `$finish` still does).  A larger N costs less, but a crash can lose up to N-1 transactions. |
 | `border_style`                     | `null` (ASCII)      | The characters used to draw the borders.  See [Border styles](#border-styles). |
 | `col_en[tag]`                      | `1`                 | `0` leaves the column out of the table.                        |
 | `col_title[tag]`                   | the tag             | The column title.  `"\n"` starts a new title line.             |

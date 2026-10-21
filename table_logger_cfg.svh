@@ -38,6 +38,12 @@ class table_logger_cfg extends uvm_object;
   // line number then counts transactions instead of rows.
   bit line_and_time_on_first_row_only = 0;
 
+  // The log file is flushed after every flush_every_n_txns transactions, so that the rows survive a
+  // simulator crash or kill.  1 flushes after every transaction.  0 never flushes (the file is still
+  // flushed by a normal $finish).  A larger value reduces the flush overhead for a busy logger, at the
+  // risk of losing up to flush_every_n_txns-1 transactions.
+  int flush_every_n_txns = 1;
+
   // The characters used to draw the table borders.  When null (the default), ASCII is used.
   // For example:
   //   txt_tbl_pkg::txt_tbl_unicode_border_style style = new(); // or txt_tbl_unicode_heavy_border_style,
