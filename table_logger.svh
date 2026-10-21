@@ -46,6 +46,7 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
   protected T_CAST t;
   protected string rows_of_fields[][string];
   protected string row_fields[string];
+  protected int txn_row; // The index of the row being logged within the transaction
   protected string row_q[$];
   protected int line_count = 0;
   protected string fields[$];
@@ -136,6 +137,7 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
     rows_of_fields = t.get_log_table();
     foreach (rows_of_fields[r]) begin
       row_fields = rows_of_fields[r];
+      txn_row = r;
       log_row();
     end
   endfunction
@@ -155,10 +157,23 @@ class table_logger #(type T_CAST=dummy_tbl_txn, type T_SUBSCRIBER=dummy_tbl_txn)
   endfunction
 
   protected virtual function string get_field_str(string field);
+    if (is_line_or_time(field) && cfg.line_and_time_on_first_row_only && is_continuation_row()) return get_empty_str();
     if (field == "line") return get_line_str();
     if (field == "time") return get_time_str();
     if (row_fields.exists(field)) return row_fields[field];
-    return cfg.empty_field_value;
+    return get_empty_str();
+  endfunction
+
+  protected virtual function string get_empty_str();
+    return is_continuation_row() ? cfg.multi_line_empty_field_value : cfg.empty_field_value;
+  endfunction
+
+  protected virtual function bit is_line_or_time(string field);
+    return (field == "line") || (field == "time");
+  endfunction
+
+  protected virtual function bit is_continuation_row();
+    return txn_row > 0;
   endfunction
 
   protected virtual function string get_line_str();

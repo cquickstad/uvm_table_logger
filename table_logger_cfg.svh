@@ -28,6 +28,16 @@ class table_logger_cfg extends uvm_object;
   // The value to place in a table location when that field is otherwise empty.
   string empty_field_value = "-";
 
+  // The value to place in an empty table location on the rows after the first row of a transaction
+  // that get_log_table() reports on multiple rows.  (The first row uses empty_field_value.)
+  // For example, "" leaves those locations blank so that only the multi-line fields stand out.
+  string multi_line_empty_field_value = "-";
+
+  // When 1, the "line" and "time" columns are written only on the first row of a transaction that
+  // get_log_table() reports on multiple rows.  The other rows get multi_line_empty_field_value.  The
+  // line number then counts transactions instead of rows.
+  bit line_and_time_on_first_row_only = 0;
+
   // The characters used to draw the table borders.  When null (the default), ASCII is used.
   // For example:
   //   txt_tbl_pkg::txt_tbl_unicode_border_style style = new(); // or txt_tbl_unicode_heavy_border_style,

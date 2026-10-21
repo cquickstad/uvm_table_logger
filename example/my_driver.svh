@@ -65,6 +65,8 @@ class my_driver extends uvm_driver #(my_item);
     vif.cb.a <= req.a;
     vif.cb.b <= req.b;
     vif.cb.c <= req.c;
+    vif.cb.data_len <= 3'(req.data.size());
+    vif.cb.data <= pack_data();
     seq_item_port.item_done();
   endtask
 
@@ -73,6 +75,13 @@ class my_driver extends uvm_driver #(my_item);
     vif.cb.a <= 'X;
     vif.cb.b <= 'X;
     vif.cb.c <= 'X;
+    vif.cb.data_len <= 'X;
+    vif.cb.data <= 'X;
   endtask
+
+  protected virtual function reg [3:0][7:0] pack_data();
+    pack_data = '0;
+    foreach (req.data[i]) pack_data[i] = req.data[i];
+  endfunction
 
 endclass

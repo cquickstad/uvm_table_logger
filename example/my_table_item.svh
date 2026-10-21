@@ -43,15 +43,18 @@ class my_table_item extends my_item;
   // The columns in the log file's table and the order of the columns are specified by the
   // following static array of strings.  Each element is a tag that represents the column.
   // The actual title of the column is set with table_logger_cfg.
-  static string log_fields[] = {"ifc", "a", "b", "c"};
+  static string log_fields[] = {"ifc", "a", "b", "c", "data"};
 
   typedef string rows_of_log_fields_t[][string];
   virtual function rows_of_log_fields_t get_log_table();
-    get_log_table = new[1]; // This transaction is reported on a single row in the table
+    // This transaction is reported on one row per data byte (at least one row).
+    // Only the first row has the other fields, so the data column spans multiple lines.
+    get_log_table = new[(data.size() > 1) ? data.size() : 1];
     get_log_table[0]["ifc"] = ifc;
     get_log_table[0]["a"] = $sformatf("%0x", a);
     get_log_table[0]["b"] = $sformatf("%0d", b);
     get_log_table[0]["c"] = c.name();
+    foreach (data[i]) get_log_table[i]["data"] = $sformatf("%0d: %02x", i, data[i]);
   endfunction
 
 endclass

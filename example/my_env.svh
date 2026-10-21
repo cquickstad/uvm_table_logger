@@ -72,6 +72,8 @@ class my_env extends uvm_env;
     log_cfg = table_logger_pkg::table_logger_cfg::type_id::create("cfg", this);
     log_cfg.log_file_name = "my_log.log";
     log_cfg.border_style = style;
+    log_cfg.multi_line_empty_field_value = ""; // Leave the other columns blank on the data continuation rows
+    log_cfg.line_and_time_on_first_row_only = 1;
     log_cfg.col_width["line"] = 3;
     log_cfg.col_width["time"] = 8;
     log_cfg.col_width["ifc"] = 1;
@@ -84,6 +86,7 @@ class my_env extends uvm_env;
     log_cfg.col_title["a"] = "Value A\n(hex)";
     log_cfg.col_title["b"] = "Value B\n(decimal)";
     log_cfg.col_title["c"] = "Value C";
+    log_cfg.col_title["data"] = "Data\n(hex)";
     uvm_config_db#(table_logger_pkg::table_logger_cfg)::set(this, "logger", "cfg", log_cfg);
   endfunction
 

@@ -64,6 +64,8 @@ class my_monitor extends uvm_monitor;
       txn.a = vif.cb.a;
       txn.b = vif.cb.b;
       txn.c = my_enum_t'(vif.cb.c);
+      txn.data = new[int'(vif.cb.data_len)];
+      foreach (txn.data[i]) txn.data[i] = vif.cb.data[i];
       ap.write(txn);
     end
   endtask
